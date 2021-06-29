@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -44,6 +46,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=255)
      */
     private $lastName;
+
+    /**
+     * @ORM\OneToMany(targetEntity=LicensePlate::class, mappedBy="user")
+     */
+    private $licensePlates;
+
+    public function __construct()
+    {
+        $this->licensePlates = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -154,6 +166,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastName(string $lastName): self
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|LicensePlate[]
+     */
+    public function getLicensePlates(): Collection
+    {
+        return $this->licensePlates;
+    }
+
+    public function addLicensePlate(LicensePlate $licensePlate): self
+    {
+        if (!$this->licensePlates->contains($licensePlate)) {
+            $this->licensePlates[] = $licensePlate;
+            $licensePlate->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLicensePlate(LicensePlate $licensePlate): self
+    {
+        if ($this->licensePlates->removeElement($licensePlate)) {
+            // set the owning side to null (unless already changed)
+            if ($licensePlate->getUser() === $this) {
+                $licensePlate->setUser(null);
+            }
+        }
 
         return $this;
     }
