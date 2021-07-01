@@ -7,6 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=LicensePlateRepository::class)
+ * @Table(name="license_plate",indexes={
+ *     @Index(name="license_idx", columns={"licensePlate","user"})
+ * })
  */
 class LicensePlate
 {
