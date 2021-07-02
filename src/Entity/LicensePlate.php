@@ -4,11 +4,14 @@ namespace App\Entity;
 
 use App\Repository\LicensePlateRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Annotations;
 
 /**
  * @ORM\Entity(repositoryClass=LicensePlateRepository::class)
- * @Table(name="license_plate",indexes={
- *     @Index(name="license_idx", columns={"licensePlate","user"})
+ * @ORM\Table(name="license_plate",
+ * uniqueConstraints={@ORM\UniqueConstraint(name="unique_idx", fields={"licensePlate", "user"})}
+ *     ,indexes={
+ *   @ORM\Index(name="license_idx", columns={"license_plate","user_id"})
  * })
  */
 class LicensePlate

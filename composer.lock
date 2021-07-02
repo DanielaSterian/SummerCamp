@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0e02680c0cd26c05af4b3453d638fb6f",
+    "content-hash": "25cf938c747d1e6bfc50bb30f29a45ac",
     "packages": [
         {
             "name": "composer/package-versions-deprecated",
@@ -3769,6 +3769,71 @@
             "time": "2021-06-17T13:29:40+00:00"
         },
         {
+            "name": "symfony/google-mailer",
+            "version": "v5.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/google-mailer.git",
+                "reference": "6b6aa67cc6a6c24adc88d98c23c642950effb739"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/google-mailer/zipball/6b6aa67cc6a6c24adc88d98c23c642950effb739",
+                "reference": "6b6aa67cc6a6c24adc88d98c23c642950effb739",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.5",
+                "symfony/mailer": "^4.4|^5.0"
+            },
+            "require-dev": {
+                "symfony/http-client": "^4.4|^5.0"
+            },
+            "type": "symfony-bridge",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Mailer\\Bridge\\Google\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Google Mailer Bridge",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/google-mailer/tree/v5.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2021-05-26T17:33:56+00:00"
+        },
+        {
             "name": "symfony/http-client",
             "version": "v5.3.2",
             "source": {
@@ -4208,16 +4273,16 @@
         },
         {
             "name": "symfony/mailer",
-            "version": "v5.3.0",
+            "version": "v5.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mailer.git",
-                "reference": "3b7f45a1f5488032da33c00f619909b4a6bf57d6"
+                "reference": "6ebd500f14402344fe4369ee88bfec27a567a24d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/mailer/zipball/3b7f45a1f5488032da33c00f619909b4a6bf57d6",
-                "reference": "3b7f45a1f5488032da33c00f619909b4a6bf57d6",
+                "url": "https://api.github.com/repos/symfony/mailer/zipball/6ebd500f14402344fe4369ee88bfec27a567a24d",
+                "reference": "6ebd500f14402344fe4369ee88bfec27a567a24d",
                 "shasum": ""
             },
             "require": {
@@ -4263,7 +4328,7 @@
             "description": "Helps sending emails",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/mailer/tree/v5.3.0"
+                "source": "https://github.com/symfony/mailer/tree/v5.3.3"
             },
             "funding": [
                 {
@@ -4279,7 +4344,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-05-27T12:56:16+00:00"
+            "time": "2021-06-24T08:13:00+00:00"
         },
         {
             "name": "symfony/mime",

@@ -7,6 +7,8 @@ use App\Form\UserType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -44,19 +46,28 @@ class SecurityController extends AbstractController
     /**
      * @Route("/register", name="user_registration")
      */
-    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function register(MailerInterface $mailer, Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
         // 1) build the form
         $user = new User();
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $user, [
+            'forPass' => false,
+        ]);
 
         // 2) handle the submit (will only happen on POST)
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
             // 3) Encode the password (you could also do this via Doctrine listener)
+            //alternative: rand_byt(max_length)
+
+            
+
+            $generatedPassword = sha1(random_bytes(5));
+            $user->setPlainPassword($generatedPassword);
             $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
             $user->setPassword($password);
+            $user->setRoles(['ROLE_USER']);
 
             // 4) save the User!
             $entityManager = $this->getDoctrine()->getManager();
@@ -66,7 +77,19 @@ class SecurityController extends AbstractController
             // ... do any other work - like sending them an email, etc
             // maybe set a "flash" success message for the user
 
-            return $this->redirectToRoute('home');
+            $email = (new Email())
+                ->from('daniela@example.com')
+                ->to($user->getEmail())
+                ->subject("Move your car!")
+                ->text("Your password is: {$user->getPlainPassword()}");
+
+            $mailer->send($email);
+
+            $this->addFlash(
+                'success',
+                'Your password has been sent to your email'
+            );
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render(

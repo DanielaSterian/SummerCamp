@@ -21,19 +21,31 @@ class UserType extends AbstractType
         $builder
             ->add('email', EmailType::class)
             ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
-            ->add('plainPassword', RepeatedType::class, array(
-                'type' => PasswordType::class,
-                'first_options'  => array('label' => 'Password'),
-                'second_options' => array('label' => 'Repeat Password'),
-            ))
-        ;
+            ->add('lastName', TextType::class);
+//            ->add('plainPassword', RepeatedType::class, array(
+//                'type' => PasswordType::class,
+//                'first_options'  => array('label' => 'Password'),
+//                'second_options' => array('label' => 'Repeat Password'),
+//            ));
+
+
+        if($options['forPass'] == true)
+        {
+            $builder
+                ->add('plainPassword', RepeatedType::class, array(
+                    'type' => PasswordType::class,
+                    'first_options'  => array('label' => 'Password'),
+                    'second_options' => array('label' => 'Repeat Password'),
+                ));
+        }
+
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'forPass' => false,
         ]);
     }
 }
