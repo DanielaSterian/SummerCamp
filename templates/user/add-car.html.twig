@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add a new car!{% endblock %}
+
+{% block body %}
+
+    <h1 class="card-title py-5 text-center"> Add a new car </h1>
+
+    <div class="container">
+        {{ form_start(form) }}
+
+        <label for="inputEmail">License plate</label>
+        {{ form_widget(form.licensePlate, {'attr': {'class': 'form-control'}}) }}
+
+        <button class="btn btn-lg btn-primary" type="submit">
+            Add
+        </button>
+        {{ form_end(form) }}
+
+    </div>
+
+{% endblock %}

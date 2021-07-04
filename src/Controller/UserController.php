@@ -42,4 +42,70 @@ class UserController extends AbstractController
 //
 //        }
 //    }
+
+    /**
+     * @Route("/add_car/{id}", name="add-car")
+     */
+    public function addCar(User $user, Request $request, UserInterface $currentUser): Response
+    {
+        if($user->getEmail() == $currentUser->getUserIdentifier())
+        {
+            $entityManager = $this->getDoctrine()->getManager();
+            $licensePlate = new LicensePlate();
+
+            $form = $this->createForm(LicensePlateType::class, $licensePlate);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid())
+            {
+                $user->addLicensePlate($licensePlate);
+
+                $entityManager->persist($licensePlate);
+                $entityManager->flush();
+
+                return $this->render('user/list-cars.html.twig', [
+                    'user' => $user,
+                ]);
+            }
+
+            return $this->render('user/add-car.html.twig',[
+                'form' => $form->createView(),
+            ]);
+        }
+
+        return $this->redirectToRoute('index');
+    }
+
+    /**
+     * @Route("/list_cars/{id}", name="list-cars")
+     */
+    public function listCars(User $user, UserInterface $currentUser)
+    {
+        if($user->getEmail() == $currentUser->getUserIdentifier())
+        {
+            $licensePlates = $user->getLicensePlates();
+
+            return $this->render('user/list-cars.html.twig',[
+                'licensePlates' => $licensePlates,
+            ]);
+        }
+
+        return $this->redirectToRoute('index');
+    }
+
+    /**
+     * @Route("/delete_car/{id}", name="delete-car")
+     */
+    public function deleteCar(LicensePlate $licensePlate): Response
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        if($licensePlate != null)
+        {
+            $entityManager->remove($licensePlate);
+            $entityManager->flush();
+        }
+        return $this->redirectToRoute('home');
+    }
+
+
 }
