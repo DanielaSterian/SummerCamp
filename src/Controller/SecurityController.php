@@ -61,8 +61,6 @@ class SecurityController extends AbstractController
             // 3) Encode the password (you could also do this via Doctrine listener)
             //alternative: rand_byt(max_length)
 
-            
-
             $generatedPassword = sha1(random_bytes(5));
             $user->setPlainPassword($generatedPassword);
             $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
@@ -80,7 +78,7 @@ class SecurityController extends AbstractController
             $email = (new Email())
                 ->from('daniela@example.com')
                 ->to($user->getEmail())
-                ->subject("Move your car!")
+                ->subject("Welcome to WhoBlockedMe!")
                 ->text("Your password is: {$user->getPlainPassword()}");
 
             $mailer->send($email);
