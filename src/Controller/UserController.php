@@ -5,11 +5,11 @@ namespace App\Controller;
 use App\Entity\LicensePlate;
 use App\Entity\User;
 use App\Form\LicensePlateType;
+use App\Form\UserType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @Route("/user")
@@ -17,80 +17,95 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class UserController extends AbstractController
 {
     /**
-     * @Route("/profile/{id}", name="profile")
+     * @Route("/profile", name="profile")
      */
-    public function details(User $user, UserInterface $currentUser): Response
+    public function details(): Response
     {
-        if($user->getEmail() == $currentUser->getUserIdentifier())
-        {
-            return $this->render('user/profile.html.twig', [
-                'user' => $user,
-            ]);
-        }
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
 
-        return $this->redirectToRoute('index');
+        return $this->render('user/profile.html.twig', [
+            'user' => $currentUser,
+        ]);
     }
 
-//    /**
-//     * @Route("/edit_profile/{id}", name="edit-profile")
-//     */
-//    public function editProfile(User $user, UserInterface $currentUser): Response
-//    {
-//        if($user->getEmail() == $currentUser->getUserIdentifier())
-//        {
-//            $entityManager = $this->getDoctrine()->getRepository(User::class);
-//
-//        }
-//    }
-
     /**
-     * @Route("/add_car/{id}", name="add-car")
+     * @Route("/edit_profile", name="edit-profile")
      */
-    public function addCar(User $user, Request $request, UserInterface $currentUser): Response
+    public function editProfile(Request $request): Response
     {
-        if($user->getEmail() == $currentUser->getUserIdentifier())
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        $userId = $currentUser->getId();
+
+        $form = $this->createForm(UserType::class, $currentUser,[
+            'forPass'=>false,
+        ]);
+
+        if($currentUser)
         {
-            $entityManager = $this->getDoctrine()->getManager();
-            $licensePlate = new LicensePlate();
-
-            $form = $this->createForm(LicensePlateType::class, $licensePlate);
             $form->handleRequest($request);
-
             if ($form->isSubmitted() && $form->isValid())
             {
-                $user->addLicensePlate($licensePlate);
-
-                $entityManager->persist($licensePlate);
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($currentUser);
                 $entityManager->flush();
 
-                return $this->render('user/list-cars.html.twig', [
-                    'user' => $user,
-                ]);
+                $this->addFlash('success', 'The changes was saved!');
+
+                return $this->redirectToRoute('edit-profile');
             }
-
-            return $this->render('user/add-car.html.twig',[
-                'form' => $form->createView(),
-            ]);
         }
-
-        return $this->redirectToRoute('index');
+        return $this->render('user/edit-profile.html.twig', [
+            'form' => $form->CreateView(),
+        ]);
     }
 
     /**
-     * @Route("/list_cars/{id}", name="list-cars")
+     * @Route("/add_car", name="add-car")
      */
-    public function listCars(User $user, UserInterface $currentUser)
+    public function addCar(Request $request): Response
     {
-        if($user->getEmail() == $currentUser->getUserIdentifier())
-        {
-            $licensePlates = $user->getLicensePlates();
+        $entityManager = $this->getDoctrine()->getManager();
+        $licensePlate = new LicensePlate();
 
-            return $this->render('user/list-cars.html.twig',[
-                'licensePlates' => $licensePlates,
-            ]);
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        $userId = $currentUser->getId();
+
+        $form = $this->createForm(LicensePlateType::class, $licensePlate);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $currentUser->addLicensePlate($licensePlate);
+
+            $entityManager->persist($licensePlate);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('list-cars');
         }
 
-        return $this->redirectToRoute('index');
+        return $this->render('user/add-car.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/list_cars", name="list-cars")
+     */
+    public function listCars()
+    {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+        $userId = $currentUser->getId();
+
+        $licensePlates = $currentUser->getLicensePlates();
+
+        return $this->render('user/list-cars.html.twig', [
+            'licensePlates' => $licensePlates,
+            'user' => $currentUser,
+        ]);
     }
 
     /**
@@ -99,13 +114,47 @@ class UserController extends AbstractController
     public function deleteCar(LicensePlate $licensePlate): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
-        if($licensePlate != null)
+
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        if($currentUser->hasLicensePlate($licensePlate))
         {
             $entityManager->remove($licensePlate);
             $entityManager->flush();
+
+            $this->addFlash('success',
+                'The car was deleted!');
         }
-        return $this->redirectToRoute('home');
+        return $this->redirectToRoute('list-cars');
     }
 
+    /**
+     * @Route("/edit-car/{id}", name="edit-car")
+     */
+    public function editCar(Request $request, LicensePlate $licensePlate):Response
+    {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
 
+        if($currentUser->hasLicensePlate($licensePlate))
+        {
+            $form = $this->createForm(LicensePlateType::class, $licensePlate);
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid())
+            {
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($licensePlate);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'The license plate was updated!');
+
+                return $this->redirectToRoute('list-cars');
+            }
+            return $this->render('user/edit-car.html.twig', [
+                'form' => $form->CreateView(),
+            ]);
+        }
+        return $this->redirectToRoute('list-cars');
+    }
 }

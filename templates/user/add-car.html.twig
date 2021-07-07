@@ -9,7 +9,9 @@
     <div class="container">
         {{ form_start(form) }}
 
-        <label for="inputEmail">License plate</label>
+        <label>
+            <b>License plate</b>
+        </label>
         {{ form_widget(form.licensePlate, {'attr': {'class': 'form-control'}}) }}
 
         <button class="btn btn-lg btn-primary" type="submit">

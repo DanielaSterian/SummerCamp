@@ -213,4 +213,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function hasLicensePlate(LicensePlate $licensePlate)
+    {
+        if($this->licensePlates->contains($licensePlate))
+        {
+            return true;
+        }
+        return false;
+    }
 }
