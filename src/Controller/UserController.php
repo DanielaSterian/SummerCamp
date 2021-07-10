@@ -7,9 +7,13 @@ use App\Entity\User;
 use App\Form\LicensePlateType;
 use App\Form\UserType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\ActivityRepository;
 
 /**
  * @Route("/user")
@@ -64,7 +68,7 @@ class UserController extends AbstractController
     /**
      * @Route("/add_car", name="add-car")
      */
-    public function addCar(Request $request): Response
+    public function addCar(Request $request, ActivityRepository $activityRepository, MailerInterface $mailer): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
         $licensePlate = new LicensePlate();
@@ -83,9 +87,25 @@ class UserController extends AbstractController
             $entityManager->persist($licensePlate);
             $entityManager->flush();
 
-            return $this->redirectToRoute('list-cars');
-        }
+//            if($currentActivity = $activityRepository->findByBlockee($licensePlate))
+//            {
+//                $email = (new Email())
+//                    ->from('daniela@example.com')
+//                    ->to($currentActivity->getBlockee())
+//                    ->subject("You have been blocked!")
+//                    ->text("You have been block by: {$currentActivity->getBlocker()}");
+//
+//                $mailer->send($email);
+//            }
+            $this->addFlash('success', 'The car was added!');
 
+            return $this->redirectToRoute('list-cars');
+
+//            $referer = $request->headers->get('referer');
+//            return new RedirectResponse($referer);
+
+//            return $this->redirect($request->request->get('referer'));
+        }
         return $this->render('user/add-car.html.twig', [
             'form' => $form->createView(),
         ]);
