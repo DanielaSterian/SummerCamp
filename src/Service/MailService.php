@@ -26,7 +26,7 @@ class MailService
             ->from('daniela@example.com')
             ->to($blocker->getUserIdentifier())
             ->subject('Someone blocked you')
-            ->text('The person '.$blockee->getUserIdentifier(). ' with car '.$license_plate.' blocked you!');
+            ->text('The person '.$blockee->getUserIdentifier(). ' with the car '.$license_plate.' blocked you!');
 
         $this->mailer->send($email);
     }
@@ -37,7 +37,7 @@ class MailService
             ->from('daniela@example.com')
             ->to($blocker->getUserIdentifier())
             ->subject('Someone blocked you')
-            ->text('The person '.$blockee->getUserIdentifier(). 'with the car '.$license_plate. ' wants to unblock her');
+            ->text('The person '.$blockee->getUserIdentifier(). ' with the car '.$license_plate. ' wants you to unblock him');
 
         $this->mailer->send($email);
     }

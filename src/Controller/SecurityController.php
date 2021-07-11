@@ -4,7 +4,10 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -57,8 +60,35 @@ class SecurityController extends AbstractController
 
         // 2) handle the submit (will only happen on POST)
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $image = $user->getImageFile();
 
+            if($image != null)
+            {
+                $filesystem = new Filesystem();
+                if($user->getImage())
+                {
+                    $filesystem->remove($this->getParameter('images_directory') . '/' . $user->getImage());
+                }
+
+                $imageName = md5(uniqid()).'.'.$image->guessExtension();
+
+                try
+                {
+                    $image->move(
+                        $this->getParameter('images_directory'),
+                        $imageName
+                    );
+                }
+                catch (FileException $e)
+                {
+                    $this->addFlash('danger', 'Could not upload the image.');
+                    $this->redirectToRoute('register');
+                }
+
+                $user->setImage($imageName);
+            }
             // 3) Encode the password (you could also do this via Doctrine listener)
             //alternative: rand_byt(max_length)
 
@@ -110,30 +140,38 @@ class SecurityController extends AbstractController
         ]);
 
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid())
+        if ($form->isSubmitted())
         {
-            if($passwordEncoder->isPasswordValid($currentUser, $form->get('currentPassword')->getData()))
+            if($form->isValid())
             {
-                $password = $passwordEncoder->encodePassword($currentUser, $currentUser->getPlainPassword());
-                $currentUser->setPassword($password);
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->flush();
+                if($passwordEncoder->isPasswordValid($currentUser, $form->get('currentPassword')->getData()))
+                {
+                    $password = $passwordEncoder->encodePassword($currentUser, $currentUser->getPlainPassword());
+                    $currentUser->setPassword($password);
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->flush();
 
-                $email = (new Email())
-                    ->from('daniela@example.com')
-                    ->to($currentUser->getEmail())
-                    ->subject("Welcome to WhoBlockedMe!")
-                    ->text("Your new password is: {$currentUser->getPlainPassword()}");
+                    $email = (new Email())
+                        ->from('daniela@example.com')
+                        ->to($currentUser->getEmail())
+                        ->subject("Welcome to WhoBlockedMe!")
+                        ->text("Your new password is: {$currentUser->getPlainPassword()}");
 
-                $mailer->send($email);
+                    $mailer->send($email);
 
-                $this->addFlash('success', 'Password was changed successfully!');
-                return $this->redirectToRoute('profile');
+                    $this->addFlash('success', 'Password was changed successfully!');
+                    return $this->redirectToRoute('profile');
+                }
+                else
+                {
+                    $this->addFlash('danger', 'Current password is not correct!');
+                }
             }
             else
-            {
-                $this->addFlash('danger', 'Current password is not correct!');
-            }
+                {
+                    $this->addFlash('danger', 'The password must have between 5-20 characters!');
+                }
+
         }
 
         return $this->render(

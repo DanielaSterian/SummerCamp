@@ -76,7 +76,7 @@ class HomeController extends AbstractController
                 $blockerEntry = $licensePlateRepo->findOneBy(['licensePlate' => $activity->getBlocker()]);
                 $mailer->sendBlockeeEmail($blockerEntry->getUser(), $blockeeEntry->getUser(), $blockerEntry->getLicensePlate());
                 $activity->setStatus(1);
-                $this->addFlash('success', 'The mail was sent to the user with car '.$blockeeEntry);
+                $this->addFlash('success', 'An email has been sent to the user with the car '.$blockeeEntry);
             }
             else
             {
@@ -86,7 +86,7 @@ class HomeController extends AbstractController
                 $entityManager->persist($licensePlate);
                 $entityManager->flush();
 
-                $this->addFlash('danger', 'The blockee do not have an account. The mail will be send after registration!');
+                $this->addFlash('danger', 'The blockee does not have an account. An email will be sent after registration!');
             }
 
             $entityManager = $this->getDoctrine()->getManager();
@@ -150,7 +150,7 @@ class HomeController extends AbstractController
                 $blockeeEntry = $licensePlateRepo->findOneBy(['licensePlate' => $activity->getBlockee()]);
                 $mailer->sendBlockerEmail($blockeeEntry->getUser(), $blockerEntry->getUser(), $blockeeEntry->getLicensePlate());
                 $activity->setStatus(1);
-                $this->addFlash('success', 'The mail was sent to the user with car '.$blockeeEntry);
+                $this->addFlash('success', 'An email has been sent to the user with the car '.$blockeeEntry);
             }
             else
             {
@@ -160,7 +160,7 @@ class HomeController extends AbstractController
                 $entityManager->persist($licensePlate);
                 $entityManager->flush();
 
-                $this->addFlash('danger', 'The blockee do not have an account. The mail will be send after registration!');
+                $this->addFlash('danger', 'The blockee does not have an account. An email will be sent after registration!');
             }
 
             $entityManager = $this->getDoctrine()->getManager();
