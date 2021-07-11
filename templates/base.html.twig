@@ -44,6 +44,7 @@
             </div>
         </div>
     </nav>
+
     {% for label, messages in app.flashes %}
         {% for message in messages %}
             <div class="alert alert-{{ label }}" role="alert">
@@ -54,9 +55,12 @@
         {% endfor %}
     {% endfor %}
 
+    {% for message in app.flashes('warning') %}
+        <div class="flash-notice alert alert-success"><i class="fa fa-check"></i> {{ message|raw }}</div>
+    {% endfor %}
 
 
-        {% block body %}
+    {% block body %}
         {% endblock %}
     </body>
 </html>

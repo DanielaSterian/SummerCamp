@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Activity;
 use App\Entity\LicensePlate;
+use App\Entity\User;
 use App\Form\ActivityBlockeeType;
 use App\Form\ActivityBlockerType;
 use App\Repository\LicensePlateRepository;
@@ -31,7 +32,40 @@ class HomeController extends AbstractController
     {
         $activity = new Activity();
 
-        $form = $this->createForm(ActivityBlockerType::class, $activity);
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        $nrOfLP = count($currentUser->getLicensePlates());
+
+        if($nrOfLP == 1)
+        {
+            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
+                'oneCar' => true,
+                'multipleCars' => false,
+            ]);
+        }
+        elseif($nrOfLP > 1)
+        {
+            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
+                'oneCar' => false,
+                'multipleCars' => true,
+            ]);
+        }
+        elseif($nrOfLP == 0)
+        {
+            $this->redirectToRoute('add-car');
+            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
+                'oneCar' => false,
+                'multipleCars' => true,
+            ]);
+            $this->addFlash("danger", 'You need to add your first car!');
+
+        }
+        else
+        {
+            $this->addFlash("danger", 'Something is wrong');
+        }
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
@@ -71,8 +105,41 @@ class HomeController extends AbstractController
      */
     public function unblockMe(Request $request, MailService $mailer, LicensePlateRepository $licensePlateRepo): Response
     {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
         $activity = new Activity();
-        $form = $this->createForm(ActivityBlockeeType::class, $activity);
+
+        $nrOfLP = count($currentUser->getLicensePlates());
+
+        if($nrOfLP == 1)
+        {
+            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
+                'oneCar' => true,
+                'multipleCars' => false,
+            ]);
+        }
+        elseif($nrOfLP > 1)
+        {
+            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
+                'oneCar' => false,
+                'multipleCars' => true,
+            ]);
+        }
+        elseif($nrOfLP == 0)
+        {
+            $this->redirectToRoute('add-car');
+            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
+                'oneCar' => false,
+                'multipleCars' => true,
+            ]);
+            $this->addFlash("danger", 'You need to add your first car!');
+        }
+        else
+        {
+            $this->addFlash("danger", 'dhgfdhjfdj');
+        }
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

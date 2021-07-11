@@ -3,19 +3,22 @@
 {% block title %}Block someone{% endblock %}
 
 {% block body %}
-
+{#    {% if  nroflp  == 0 %}#}
+{#        <a type="button" class="btn btn-dark" href="{{ path('add-car') }}">Add your first car!</a>#}
+{#    {% endif %}#}
     <h1 class="card-title py-5 text-center"> Block someone </h1>
+
 
     <div class="container">
         {{ form_start(form) }}
 
         <label>
-            <b>Blocker</b>
+            <b>Blockee</b>
         </label>
         {{ form_widget(form.blocker, {'attr': {'class': 'form-control'}}) }}
 
         <label>
-            <b>Blockee</b>
+            <b>Blocker</b>
         </label>
         {{ form_widget(form.blockee, {'attr': {'class': 'form-control'}}) }}
 

@@ -81,41 +81,49 @@ class UserController extends AbstractController
         $form = $this->createForm(LicensePlateType::class, $lp);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid())
+        if ($form->isSubmitted() )
         {
-            $entrylicensePlate = $licensePlateRepo->findOneBy(['licensePlate' => $lp->getLicensePlate()]);
-            if($entrylicensePlate && !$entrylicensePlate->getUser())
+            if($form->isValid())
             {
-                $entrylicensePlate->setUser($currentUser);
-
-                $blocker = $activityService->iveBlockedSomebody($entrylicensePlate->getLicensePlate());
-                if($blocker)
+                $entrylicensePlate = $licensePlateRepo->findOneBy(['licensePlate' => $lp->getLicensePlate()]);
+                if($entrylicensePlate && !$entrylicensePlate->getUser())
                 {
-                    $blockerLP = $licensePlateRepo->findOneBy(['licensePlate', $blocker]);
-                    $mailer->sendBlockeeEmail($blockerLP->getUser(), $entrylicensePlate->getUser(), $blockerLP->getLicensePlate());
-                    $activity->setStatus(1);
+                    $entrylicensePlate->setUser($currentUser);
+
+                    $blocker = $activityService->iveBlockedSomebody($entrylicensePlate->getLicensePlate());
+                    if($blocker)
+                    {
+                        $blockerLP = $licensePlateRepo->findOneBy(['licensePlate', $blocker]);
+                        $mailer->sendBlockeeEmail($blockerLP->getUser(), $entrylicensePlate->getUser(), $blockerLP->getLicensePlate());
+                        $activity->setStatus(1);
+                    }
+
+                    $blockee = $activityService->whoBlockedMe($entrylicensePlate->getLicensePlate());
+                    if($blockee)
+                    {
+                        $blockeeLP = $licensePlateRepo->findOneBy(['licensePlate', $blockee]);
+                        $mailer->sendBlockerEmail($blockeeLP->getUser(), $entrylicensePlate->getUser(), $blockerLP->getLicensePlate());
+                        $activity->setStatus(1);
+                    }
                 }
 
-                $blockee = $activityService->whoBlockedMe($entrylicensePlate->getLicensePlate());
-                if($blockee)
-                {
-                    $blockeeLP = $licensePlateRepo->findOneBy(['licensePlate', $blockee]);
-                    $mailer->sendBlockerEmail($blockeeLP->getUser(), $entrylicensePlate->getUser(), $blockerLP->getLicensePlate());
-                    $activity->setStatus(1);
-                }
-            }
+                $currentUser->addLicensePlate($lp);
+                $entityManager->persist($lp);
+                $entityManager->flush();
 
-            $currentUser->addLicensePlate($lp);
-            $entityManager->persist($lp);
-            $entityManager->flush();
+                $this->addFlash('success', 'The car was added!');
 
-            $this->addFlash('success', 'The car was added!');
-
-            return $this->redirectToRoute('list-cars');
+                return $this->redirectToRoute('list-cars');
 
 //            $referer = $request->headers->get('referer');
 //            return new RedirectResponse($referer);
 //            return $this->redirect($request->request->get('referer'));
+            }
+            else
+            {
+                $this->addFlash('danger', 'Lp can contain only uppercase and numbers');
+            }
+
         }
         return $this->render('user/add-car.html.twig', [
             'form' => $form->createView(),
