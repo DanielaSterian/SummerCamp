@@ -2,16 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Activity;
 use App\Entity\LicensePlate;
 use App\Entity\User;
 use App\Form\LicensePlateType;
 use App\Form\UserType;
+use App\Repository\LicensePlateRepository;
+use App\Service\ActivityService;
+use App\Service\MailService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\ActivityRepository;
 
@@ -68,42 +69,52 @@ class UserController extends AbstractController
     /**
      * @Route("/add_car", name="add-car")
      */
-    public function addCar(Request $request, ActivityRepository $activityRepository, MailerInterface $mailer): Response
+    public function addCar(Request $request, ActivityService $activityService, LicensePlateRepository $licensePlateRepo, ActivityRepository $activityRepository, MailService $mailer): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
-        $licensePlate = new LicensePlate();
+        $lp = new LicensePlate();
+        $activity = new Activity();
 
         /** @var User $currentUser */
         $currentUser = $this->getUser();
-        $userId = $currentUser->getId();
 
-        $form = $this->createForm(LicensePlateType::class, $licensePlate);
+        $form = $this->createForm(LicensePlateType::class, $lp);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $currentUser->addLicensePlate($licensePlate);
+            $entrylicensePlate = $licensePlateRepo->findOneBy(['licensePlate' => $lp->getLicensePlate()]);
+            if($entrylicensePlate && !$entrylicensePlate->getUser())
+            {
+                $entrylicensePlate->setUser($currentUser);
 
-            $entityManager->persist($licensePlate);
+                $blocker = $activityService->iveBlockedSomebody($entrylicensePlate->getLicensePlate());
+                if($blocker)
+                {
+                    $blockerLP = $licensePlateRepo->findOneBy(['licensePlate', $blocker]);
+                    $mailer->sendBlockeeEmail($blockerLP->getUser(), $entrylicensePlate->getUser(), $blockerLP->getLicensePlate());
+                    $activity->setStatus(1);
+                }
+
+                $blockee = $activityService->whoBlockedMe($entrylicensePlate->getLicensePlate());
+                if($blockee)
+                {
+                    $blockeeLP = $licensePlateRepo->findOneBy(['licensePlate', $blockee]);
+                    $mailer->sendBlockerEmail($blockeeLP->getUser(), $entrylicensePlate->getUser(), $blockerLP->getLicensePlate());
+                    $activity->setStatus(1);
+                }
+            }
+
+            $currentUser->addLicensePlate($lp);
+            $entityManager->persist($lp);
             $entityManager->flush();
 
-//            if($currentActivity = $activityRepository->findByBlockee($licensePlate))
-//            {
-//                $email = (new Email())
-//                    ->from('daniela@example.com')
-//                    ->to($currentActivity->getBlockee())
-//                    ->subject("You have been blocked!")
-//                    ->text("You have been block by: {$currentActivity->getBlocker()}");
-//
-//                $mailer->send($email);
-//            }
             $this->addFlash('success', 'The car was added!');
 
             return $this->redirectToRoute('list-cars');
 
 //            $referer = $request->headers->get('referer');
 //            return new RedirectResponse($referer);
-
 //            return $this->redirect($request->request->get('referer'));
         }
         return $this->render('user/add-car.html.twig', [

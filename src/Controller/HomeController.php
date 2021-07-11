@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Activity;
 use App\Entity\LicensePlate;
+use App\Form\ActivityBlockeeType;
 use App\Form\ActivityBlockerType;
 use App\Repository\LicensePlateRepository;
 use App\Service\MailService;
@@ -65,5 +66,46 @@ class HomeController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/unblock_me", name="unblock-me")
+     */
+    public function unblockMe(Request $request, MailService $mailer, LicensePlateRepository $licensePlateRepo): Response
+    {
+        $activity = new Activity();
+        $form = $this->createForm(ActivityBlockeeType::class, $activity);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $blockerEntry = $licensePlateRepo->findOneBy(['licensePlate'=>$activity->getBlocker()]);
+            if($blockerEntry)
+            {
+                $blockeeEntry = $licensePlateRepo->findOneBy(['licensePlate' => $activity->getBlockee()]);
+                $mailer->sendBlockerEmail($blockeeEntry->getUser(), $blockerEntry->getUser(), $blockeeEntry->getLicensePlate());
+                $activity->setStatus(1);
+                $this->addFlash('success', 'The mail was sent to the user with car '.$blockeeEntry);
+            }
+            else
+            {
+                $licensePlate = new LicensePlate();
+                $entityManager = $this->getDoctrine()->getManager();
+                $licensePlate->setLicensePlate($activity->getBlocker());
+                $entityManager->persist($licensePlate);
+                $entityManager->flush();
+
+                $this->addFlash('danger', 'The blockee do not have an account. The mail will be send after registration!');
+            }
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($activity);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('home');
+        }
+
+        return $this->render('home/unblock-me.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 }
 

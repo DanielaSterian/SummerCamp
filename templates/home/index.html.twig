@@ -42,7 +42,7 @@
         <div class="btn-group btn-group-lg col-md-8" >
             <a type="button" class="btn btn-dark" href="{{ path('list-cars', {id:app.user.id}) }}">View your cars</a>
             <a type="button" class="btn btn-dark" href="{{ path('block-someone', {id:app.user.id}) }}">Block someone</a>
-            <a type="button" class="btn btn-dark">Unblock me</a>
+            <a type="button" class="btn btn-dark" href="{{ path('unblock-me', {id:app.user.id}) }}">Unblock me</a>
         </div>
     </div>
 

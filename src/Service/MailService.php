@@ -30,4 +30,15 @@ class MailService
 
         $this->mailer->send($email);
     }
+
+    public function sendBlockerEmail(User $blocker, User $blockee, string $license_plate)
+    {
+        $email = (new Email())
+            ->from('daniela@example.com')
+            ->to($blocker->getUserIdentifier())
+            ->subject('Someone blocked you')
+            ->text('The person '.$blockee->getUserIdentifier(). 'with the car '.$license_plate. ' wants to unblock her');
+
+        $this->mailer->send($email);
+    }
 }
