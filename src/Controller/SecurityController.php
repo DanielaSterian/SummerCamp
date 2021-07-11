@@ -12,6 +12,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use function Sodium\add;
 
 class SecurityController extends AbstractController
 {
@@ -94,5 +95,51 @@ class SecurityController extends AbstractController
             'security/register.html.twig',
             array('form' => $form->createView())
         );
+    }
+
+    /**
+     * @Route("change_password", name="change-password")
+     */
+    public function changePassword(Request $request,UserPasswordEncoderInterface $passwordEncoder, MailerInterface $mailer): Response
+    {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        $form = $this->createForm(UserType::class, $currentUser, [
+            'forPass' => true,
+        ]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            if($passwordEncoder->isPasswordValid($currentUser, $form->get('currentPassword')->getData()))
+            {
+                $password = $passwordEncoder->encodePassword($currentUser, $currentUser->getPlainPassword());
+                $currentUser->setPassword($password);
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->flush();
+
+                $email = (new Email())
+                    ->from('daniela@example.com')
+                    ->to($currentUser->getEmail())
+                    ->subject("Welcome to WhoBlockedMe!")
+                    ->text("Your new password is: {$currentUser->getPlainPassword()}");
+
+                $mailer->send($email);
+
+                $this->addFlash('success', 'Password was changed successfully!');
+                return $this->redirectToRoute('profile');
+            }
+            else
+            {
+                $this->addFlash('danger', 'Current password is not correct!');
+            }
+        }
+
+        return $this->render(
+            'security/change-password.html.twig',
+            array('form' => $form->createView())
+        );
+
     }
 }

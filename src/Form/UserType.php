@@ -26,11 +26,14 @@ class UserType extends AbstractType
         if($options['forPass'] == true)
         {
             $builder
-                ->add('plainPassword', RepeatedType::class, array(
+                ->add('currentPassword', PasswordType::class,[
+                    'mapped'=>false,
+                ])
+                ->add('plainPassword', RepeatedType::class, [
                     'type' => PasswordType::class,
                     'first_options'  => array('label' => 'Password'),
                     'second_options' => array('label' => 'Repeat Password'),
-                ));
+                ]);
         }
     }
 
