@@ -62,15 +62,15 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid())
         {
-            $image = $user->getImageFile();
+            $image = $form->get('imageFile')->getData();
 
             if($image != null)
             {
-                $filesystem = new Filesystem();
-                if($user->getImage())
-                {
-                    $filesystem->remove($this->getParameter('images_directory') . '/' . $user->getImage());
-                }
+//                $filesystem = new Filesystem();
+//                if($user->getImage())
+//                {
+//                    $filesystem->remove($this->getParameter('images_directory') . '/' . $user->getImage());
+//                }
 
                 $imageName = md5(uniqid()).'.'.$image->guessExtension();
 

@@ -64,14 +64,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $image;
 
-    /**
-     * @Assert\Image(
-     *     mimeTypes = {"image/jpeg", "image/png", "image/jpg"},
-     *     mimeTypesMessage = "Only jpg, jpeg or png are allowed."
-     * )
-     */
-    private $imageFile;
-
     public function __construct()
     {
         $this->licensePlates = new ArrayCollection();
@@ -245,18 +237,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setImage(?string $image): self
     {
         $this->image = $image;
-
-        return $this;
-    }
-
-    public function getImageFile(): ?File
-    {
-        return $this->imageFile;
-    }
-
-    public function setImageFile(File $imageFile): self
-    {
-        $this->imageFile = $imageFile;
 
         return $this;
     }

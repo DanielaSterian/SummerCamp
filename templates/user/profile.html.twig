@@ -6,40 +6,40 @@
 <div class="w-100 text-center px-5">
     <h1 class="card-title py-5 text-center"> Your profile, {{ user.firstName}} </h1>
     {% if(user != null) %}
-    <table class="table table-striped table-dark">
-        <tr>
-            <th>
-                First Name
-            </th>
-            <td>
-                {{ user.getFirstName() }}
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Last Name
-            </th>
-            <td>
-                {{ user.getLastName() }}
-            </td>
-        </tr>
-        <tr>
-            <th>
-                Email
-            </th>
-            <td>
-                {{ user.getUserIdentifier() }}
-            </td>
-        </tr>
+        <img src="{{ asset('uploads/' ~ user.image) }}" class="w-25">
+        <table class="table table-striped table-dark">
+            <tr>
+                <th>
+                    First Name
+                </th>
+                <td>
+                    {{ user.getFirstName() }}
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Last Name
+                </th>
+                <td>
+                    {{ user.getLastName() }}
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Email
+                </th>
+                <td>
+                    {{ user.getUserIdentifier() }}
+                </td>
+            </tr>
 
-    </table>
-{#    <a type="button" class="btn btn-secondary p-3 m-2" href="#">#}
-{#        <i class="fa fa-backward" aria-hidden="true"></i> Back#}
-{#    </a>#}
-    <a class="btn btn-warning p-3 m-2" name="update-user" href="{{ path('edit-profile')}}">
-        <i class="fa fa-edit" aria-hidden="true"></i> Edit
-    </a>
-    </div>
+        </table>
+    {#    <a type="button" class="btn btn-secondary p-3 m-2" href="#">#}
+    {#        <i class="fa fa-backward" aria-hidden="true"></i> Back#}
+    {#    </a>#}
+        <a class="btn btn-warning p-3 m-2" name="update-user" href="{{ path('edit-profile')}}">
+            <i class="fa fa-edit" aria-hidden="true"></i> Edit
+        </a>
     {% endif %}
-
+</div>
 {% endblock %}

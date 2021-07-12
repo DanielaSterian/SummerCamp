@@ -26,7 +26,7 @@ class UserType extends AbstractType
             ->add('lastName', TextType::class)
             ->add('imageFile', FileType::class,[
                 'label' => 'Profile Image (PNG/JPG/JPEG)',
-                'data_class' => null,
+                'mapped' => false,
                 'required' => false,
                 'attr' => [
                     'class' => 'form-control'
