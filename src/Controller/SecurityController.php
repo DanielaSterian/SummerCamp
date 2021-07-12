@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use App\Service\MailService;
 use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -50,7 +51,7 @@ class SecurityController extends AbstractController
     /**
      * @Route("/register", name="user_registration")
      */
-    public function register(MailerInterface $mailer, Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function register(MailerInterface $mailer, Request $request, UserPasswordEncoderInterface $passwordEncoder, MailService $mail)
     {
         // 1) build the form
         $user = new User();
@@ -64,16 +65,9 @@ class SecurityController extends AbstractController
         {
             $image = $form->get('imageFile')->getData();
 
-            if($image != null)
+            if(!empty($image))
             {
-//                $filesystem = new Filesystem();
-//                if($user->getImage())
-//                {
-//                    $filesystem->remove($this->getParameter('images_directory') . '/' . $user->getImage());
-//                }
-
                 $imageName = md5(uniqid()).'.'.$image->guessExtension();
-
                 try
                 {
                     $image->move(
@@ -106,13 +100,7 @@ class SecurityController extends AbstractController
             // ... do any other work - like sending them an email, etc
             // maybe set a "flash" success message for the user
 
-            $email = (new Email())
-                ->from('daniela@example.com')
-                ->to($user->getEmail())
-                ->subject("Welcome to WhoBlockedMe!")
-                ->text("Your password is: {$user->getPlainPassword()}");
-
-            $mailer->send($email);
+            $mail->sendRegistrationEmail($user);
 
             $this->addFlash(
                 'success',
@@ -167,10 +155,10 @@ class SecurityController extends AbstractController
                     $this->addFlash('danger', 'Current password is not correct!');
                 }
             }
-            else
-                {
-                    $this->addFlash('danger', 'The password must have between 5-20 characters!');
-                }
+//            else
+//                {
+//                    $this->addFlash('danger', 'The password must have between 5-20 characters!');
+//                }
 
         }
 

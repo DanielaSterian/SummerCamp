@@ -41,4 +41,15 @@ class MailService
 
         $this->mailer->send($email);
     }
+
+    public function sendRegistrationEmail(User $user)
+    {
+        $email = (new Email())
+            ->from('daniela@example.com')
+            ->to($user->getUserIdentifier())
+            ->subject('Welcome to WhoBlockedMe, !'.$user->getFirstName() )
+            ->text('Your password is: '.$user->getPlainPassword());
+
+        $this->mailer->send($email);
+    }
 }
