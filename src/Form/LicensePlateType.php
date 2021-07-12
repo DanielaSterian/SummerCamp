@@ -18,13 +18,7 @@ class LicensePlateType extends AbstractType
         $builder
             ->add('licensePlate', TextType::class,[
                 'required' => true,
-//                'constraints' =>[new Regex("^[A-Z0-9]*$^"),
-                'constraints' => [
-                    new Regex([
-                        'pattern' => '^[A-Z0-9]^',
-                    ])
-                ]
-        ]);
+            ]);
     }
     public function configureOptions(OptionsResolver $resolver)
     {

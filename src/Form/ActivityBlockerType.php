@@ -24,16 +24,6 @@ class ActivityBlockerType extends AbstractType
     }
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-
-            ->add('blockee', TextType::class,[
-                'constraints' => [
-                    new Regex([
-                        'pattern' => '^[A-Z0-9]^',
-                    ])
-                ]
-            ]);
-
         if($options['oneCar'] == true)
         {
             $builder
@@ -62,6 +52,8 @@ class ActivityBlockerType extends AbstractType
                     },
                     'choice_label' => 'license_plate',]);
         }
+        $builder
+            ->add('blockee', TextType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver)

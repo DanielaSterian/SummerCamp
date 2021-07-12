@@ -61,13 +61,7 @@ class ActivityBlockeeType extends AbstractType
         {
             $builder
 
-                ->add('blockee', TextType::class, [
-                    'constraints' => [
-                        new Regex([
-                            'pattern' => '^[A-Z0-9]^',
-                        ])
-                    ]
-                ]);
+                ->add('blockee', TextType::class);
         }
     }
 

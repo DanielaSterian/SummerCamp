@@ -41,7 +41,6 @@ class UserController extends AbstractController
     {
         /** @var User $currentUser */
         $currentUser = $this->getUser();
-        $userId = $currentUser->getId();
 
         $form = $this->createForm(UserType::class, $currentUser,[
             'forPass'=>false,
@@ -81,11 +80,15 @@ class UserController extends AbstractController
         $form = $this->createForm(LicensePlateType::class, $lp);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() )
+        $initialLP = $lp->getLicensePlate();
+        $finalLP = preg_replace('/[^0-9a-zA-Z]/', '', $initialLP);
+        $lp->setLicensePlate(strtoupper($finalLP));
+
+
+        if ($form->isSubmitted() && $form->isValid())
         {
-            if($form->isValid())
-            {
                 $entrylicensePlate = $licensePlateRepo->findOneBy(['licensePlate' => $lp->getLicensePlate()]);
+
                 if($entrylicensePlate && !$entrylicensePlate->getUser())
                 {
                     $entrylicensePlate->setUser($currentUser);
@@ -108,6 +111,7 @@ class UserController extends AbstractController
                 }
 
                 $currentUser->addLicensePlate($lp);
+
                 $entityManager->persist($lp);
                 $entityManager->flush();
 
@@ -118,11 +122,6 @@ class UserController extends AbstractController
 //            $referer = $request->headers->get('referer');
 //            return new RedirectResponse($referer);
 //            return $this->redirect($request->request->get('referer'));
-            }
-            else
-            {
-                $this->addFlash('danger', 'Lp can contain only uppercase and numbers');
-            }
 
         }
         return $this->render('user/add-car.html.twig', [

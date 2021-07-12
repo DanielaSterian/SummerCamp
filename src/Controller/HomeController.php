@@ -39,27 +39,22 @@ class HomeController extends AbstractController
 
         if($nrOfLP == 1)
         {
-            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
+            $form = $this->createForm(ActivityBlockerType::class, $activity,[
                 'oneCar' => true,
                 'multipleCars' => false,
             ]);
         }
         elseif($nrOfLP > 1)
         {
-            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
+            $form = $this->createForm(ActivityBlockerType::class, $activity,[
                 'oneCar' => false,
                 'multipleCars' => true,
             ]);
         }
         elseif($nrOfLP == 0)
         {
-            $this->redirectToRoute('add-car');
-            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
-                'oneCar' => false,
-                'multipleCars' => true,
-            ]);
             $this->addFlash("danger", 'You need to add your first car!');
-
+            return $this->redirectToRoute('add-car');
         }
         else
         {
@@ -71,6 +66,7 @@ class HomeController extends AbstractController
         if ($form->isSubmitted() && $form->isValid())
         {
             $blockeeEntry = $licensePlateRepo->findOneBy(['licensePlate'=>$activity->getBlockee()]);
+
             if($blockeeEntry)
             {
                 $blockerEntry = $licensePlateRepo->findOneBy(['licensePlate' => $activity->getBlocker()]);
@@ -81,8 +77,12 @@ class HomeController extends AbstractController
             else
             {
                 $licensePlate = new LicensePlate();
+
+                $initialLP = $activity->getBlockee();
+                $finalLP = preg_replace('/[^0-9a-zA-Z]/', '', $initialLP);
+                $licensePlate->setLicensePlate(strtoupper($finalLP));
+
                 $entityManager = $this->getDoctrine()->getManager();
-                $licensePlate->setLicensePlate($activity->getBlockee());
                 $entityManager->persist($licensePlate);
                 $entityManager->flush();
 
@@ -155,8 +155,12 @@ class HomeController extends AbstractController
             else
             {
                 $licensePlate = new LicensePlate();
+
+                $initialLP = $activity->getBlocker();
+                $finalLP = preg_replace('/[^0-9a-zA-Z]/', '', $initialLP);
+                $licensePlate->setLicensePlate(strtoupper($finalLP));
+
                 $entityManager = $this->getDoctrine()->getManager();
-                $licensePlate->setLicensePlate($activity->getBlocker());
                 $entityManager->persist($licensePlate);
                 $entityManager->flush();
 
