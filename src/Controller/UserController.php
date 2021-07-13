@@ -113,9 +113,12 @@ class UserController extends AbstractController
                         $this->addFlash('warning', 'You blocked the car '.$activity->getBlockee());
                     }
                 }
-                
-                $entityManager->flush();
+                else {
+                    $currentUser->addLicensePlate($lp);
+                    $entityManager->persist($lp);
+                }
 
+                $entityManager->flush();
                 $this->addFlash('success', 'The car was added!');
 
                 return $this->redirectToRoute('list-cars');
@@ -171,19 +174,38 @@ class UserController extends AbstractController
     /**
      * @Route("/edit-car/{id}", name="edit-car")
      */
-    public function editCar(Request $request, LicensePlate $licensePlate):Response
+    public function editCar(Request $request, LicensePlate $licensePlate, ActivityRepository $activityRepo):Response
     {
         /** @var User $currentUser */
         $currentUser = $this->getUser();
 
+        $entityManager = $this->getDoctrine()->getManager();
+
         if($currentUser->hasLicensePlate($licensePlate))
         {
+            $oldLicensePlate = $licensePlate->getLicensePlate();
+
             $form = $this->createForm(LicensePlateType::class, $licensePlate);
             $form->handleRequest($request);
+
             if ($form->isSubmitted() && $form->isValid())
             {
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->persist($licensePlate);
+                $lp = $licensePlate->getLicensePlate();
+                $activities = $activityRepo->findByBlockersAndBlockees($oldLicensePlate);
+
+                foreach ($activities as $activity)
+                {
+                    /** @var Activity $activity */
+                    if($activity->getBlockee() == $oldLicensePlate)
+                    {
+                        $activity->setBlockee($lp);
+                    }
+                    elseif($activity->getBlocker() == $oldLicensePlate)
+                    {
+                        $activity->setBlocker($lp);
+                    }
+                }
+
                 $entityManager->flush();
 
                 $this->addFlash('success', 'The license plate was updated!');

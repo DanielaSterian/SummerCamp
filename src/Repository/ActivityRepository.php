@@ -49,4 +49,15 @@ class ActivityRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
             ;
     }
+
+    public function findByBlockersAndBlockees($value)
+    {
+        return $this->createQueryBuilder('lp')
+            ->andWhere('lp.blocker = :val')
+            ->orWhere('lp.blockee = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }
