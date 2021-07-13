@@ -113,7 +113,12 @@ class HomeController extends AbstractController
 
         $nrOfLP = $counterService->countLP($currentUser);
 
-        if($nrOfLP == 1)
+        if($nrOfLP == 0)
+        {
+            $this->addFlash("danger", 'You need to add your first car!');
+            return $this->redirectToRoute('add-car');
+        }
+        elseif($nrOfLP == 1)
         {
             $form = $this->createForm(ActivityBlockeeType::class, $activity,[
                 'oneCar' => true,
@@ -126,19 +131,6 @@ class HomeController extends AbstractController
                 'oneCar' => false,
                 'multipleCars' => true,
             ]);
-        }
-        elseif($nrOfLP == 0)
-        {
-            $this->redirectToRoute('add-car');
-            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
-                'oneCar' => false,
-                'multipleCars' => true,
-            ]);
-            $this->addFlash("danger", 'You need to add your first car!');
-        }
-        else
-        {
-            $this->addFlash("danger", 'dhgfdhjfdj');
         }
 
         $form->handleRequest($request);

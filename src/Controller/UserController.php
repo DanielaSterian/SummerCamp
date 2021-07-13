@@ -13,8 +13,11 @@ use App\Service\MailService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\ActivityRepository;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/user")
@@ -68,11 +71,10 @@ class UserController extends AbstractController
     /**
      * @Route("/add_car", name="add-car")
      */
-    public function addCar(Request $request, ActivityService $activityService, LicensePlateRepository $licensePlateRepo, ActivityRepository $activityRepository, MailService $mailer): Response
+    public function addCar(Request $request, ActivityService $activityService,LicensePlateRepository $licensePlateRepo, MailService $mailer): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
         $lp = new LicensePlate();
-        $activity = new Activity();
 
         /** @var User $currentUser */
         $currentUser = $this->getUser();
@@ -80,39 +82,38 @@ class UserController extends AbstractController
         $form = $this->createForm(LicensePlateType::class, $lp);
         $form->handleRequest($request);
 
-        $initialLP = $lp->getLicensePlate();
-        $finalLP = preg_replace('/[^0-9a-zA-Z]/', '', $initialLP);
-        $lp->setLicensePlate(strtoupper($finalLP));
-
-
         if ($form->isSubmitted() && $form->isValid())
         {
+            $finalLP = preg_replace('/[^0-9a-zA-Z]/', '', $lp->getLicensePlate());
+            $lp->setLicensePlate(strtoupper($finalLP));
                 $entrylicensePlate = $licensePlateRepo->findOneBy(['licensePlate' => $lp->getLicensePlate()]);
 
                 if($entrylicensePlate && !$entrylicensePlate->getUser())
                 {
                     $entrylicensePlate->setUser($currentUser);
 
-                    $blocker = $activityService->iveBlockedSomebody($entrylicensePlate->getLicensePlate());
+                    $blocker = $activityService->whoBlockedMe($lp->getLicensePlate());
                     if($blocker)
                     {
-                        $blockerLP = $licensePlateRepo->findOneBy(['licensePlate', $blocker]);
+                        $blockerLP = $licensePlateRepo->findOneBy(['licensePlate' => $blocker]);
+                        $activity = $entityManager->getRepository(Activity::class)->findOneBy(['blocker' => $blockerLP->getLicensePlate()]);
+
                         $mailer->sendBlockeeEmail($blockerLP->getUser(), $entrylicensePlate->getUser(), $blockerLP->getLicensePlate());
                         $activity->setStatus(1);
+                        $this->addFlash('warning', 'Your car has been blocked by '.$activity->getBlocker());
                     }
 
-                    $blockee = $activityService->whoBlockedMe($entrylicensePlate->getLicensePlate());
+                    $blockee = $activityService->iveBlockedSomebody($lp->getLicensePlate());
                     if($blockee)
                     {
-                        $blockeeLP = $licensePlateRepo->findOneBy(['licensePlate', $blockee]);
-                        $mailer->sendBlockerEmail($blockeeLP->getUser(), $entrylicensePlate->getUser(), $blockerLP->getLicensePlate());
+                        $blockeeLP = $licensePlateRepo->findOneBy(['licensePlate' => $blockee]);
+                        $activity = $entityManager->getRepository(Activity::class)->findOneBy(['blockee' => $blockeeLP->getLicensePlate()]);
+                        $mailer->sendBlockerEmail($blockeeLP->getUser(), $entrylicensePlate->getUser(), $blockeeLP->getLicensePlate());
                         $activity->setStatus(1);
+                        $this->addFlash('warning', 'You blocked the car '.$activity->getBlockee());
                     }
                 }
-
-                $currentUser->addLicensePlate($lp);
-
-                $entityManager->persist($lp);
+                
                 $entityManager->flush();
 
                 $this->addFlash('success', 'The car was added!');
@@ -194,5 +195,53 @@ class UserController extends AbstractController
             ]);
         }
         return $this->redirectToRoute('list-cars');
+    }
+
+    /**
+     * @Route("change_password", name="change-password")
+     */
+    public function changePassword(Request $request,UserPasswordEncoderInterface $passwordEncoder, MailService $mailer): Response
+    {
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        $form = $this->createForm(UserType::class, $currentUser, [
+            'forPass' => true,
+        ]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted())
+        {
+            if($form->isValid())
+            {
+                if($passwordEncoder->isPasswordValid($currentUser, $form->get('currentPassword')->getData()))
+                {
+                    $password = $passwordEncoder->encodePassword($currentUser, $currentUser->getPlainPassword());
+                    $currentUser->setPassword($password);
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->flush();
+
+                    $mailer->sendRegistrationEmail($currentUser);
+
+                    $this->addFlash('success', 'Password was changed successfully!');
+                    return $this->redirectToRoute('profile');
+                }
+                else
+                {
+                    $this->addFlash('danger', 'Current password is not correct!');
+                }
+            }
+//            else
+//                {
+//                    $this->addFlash('danger', 'The password must have between 5-20 characters!');
+//                }
+
+        }
+
+        return $this->render(
+            'user/change-password.html.twig',
+            array('form' => $form->createView())
+        );
+
     }
 }
