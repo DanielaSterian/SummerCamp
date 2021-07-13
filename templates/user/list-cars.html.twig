@@ -20,14 +20,40 @@
                         <td>{{ loop.index  }}</td>
                         <td>{{ licensePlate.getLicensePlate() }}</td>
                         <td>
-                            <a class="btn btn-danger btn-sm p-3 m-2" href="{{ path('delete-car', {id:licensePlate.id}) }}">
-                                <i class="fa fa-edit" aria-hidden="true"></i> Delete
-                            </a>
+{#                            <a class="btn btn-danger btn-sm p-3 m-2" href="{{ path('delete-car', {id:licensePlate.id}) }}">#}
+{#                                <i class="fa fa-edit" aria-hidden="true"></i> Delete#}
+{#                            </a>#}
+                            <button type="button" class="btn btn-danger btn-sm p-3 m-2" data-bs-toggle="modal" data-bs-target="#delete-{{ licensePlate.id }}">
+                                 Delete
+                            </button>
                             <a class="btn btn-warning btn-sm p-3 m-2" href="{{ path('edit-car', {id:licensePlate.id}) }}">
-                                <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                                 Edit
                             </a>
                         </td>
                     </tr>
+                    
+                    <div class="modal fade" id="delete-{{ licensePlate.id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="staticBackdropLabel">Remove Car</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <h6>Are you sure you want to remove the car with the licensePlate <b> {{ licensePlate.licensePlate }} </b> ?</h6>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        Close
+                                    </button>
+                                    <a type="button" class="btn btn-danger" href="{{ path('delete-car', {id:licensePlate.id}) }}">Confirm</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 {% endfor %}
             </tbody>
         </table>
