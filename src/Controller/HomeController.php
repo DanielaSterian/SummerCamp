@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\ActivityBlockeeType;
 use App\Form\ActivityBlockerType;
 use App\Repository\LicensePlateRepository;
+use App\Service\CounterService;
 use App\Service\MailService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,16 +29,21 @@ class HomeController extends AbstractController
     /**
      * @Route("/block_someone", name="block-someone")
      */
-    public function blockSomeone(Request $request, MailService $mailer, LicensePlateRepository $licensePlateRepo): Response
+    public function blockSomeone(Request $request, MailService $mailer, LicensePlateRepository $licensePlateRepo, CounterService $counterService): Response
     {
         $activity = new Activity();
 
         /** @var User $currentUser */
         $currentUser = $this->getUser();
 
-        $nrOfLP = count($currentUser->getLicensePlates());
+        $nrOfLP = $counterService->countLP($currentUser);
 
-        if($nrOfLP == 1)
+        if($nrOfLP == 0)
+        {
+            $this->addFlash("danger", 'You need to add your first car!');
+            return $this->redirectToRoute('add-car');
+        }
+        elseif($nrOfLP == 1)
         {
             $form = $this->createForm(ActivityBlockerType::class, $activity,[
                 'oneCar' => true,
@@ -50,11 +56,6 @@ class HomeController extends AbstractController
                 'oneCar' => false,
                 'multipleCars' => true,
             ]);
-        }
-        elseif($nrOfLP == 0)
-        {
-            $this->addFlash("danger", 'You need to add your first car!');
-            return $this->redirectToRoute('add-car');
         }
         else
         {
@@ -103,14 +104,14 @@ class HomeController extends AbstractController
     /**
      * @Route("/unblock_me", name="unblock-me")
      */
-    public function unblockMe(Request $request, MailService $mailer, LicensePlateRepository $licensePlateRepo): Response
+    public function unblockMe(Request $request, MailService $mailer, LicensePlateRepository $licensePlateRepo, CounterService $counterService): Response
     {
         /** @var User $currentUser */
         $currentUser = $this->getUser();
 
         $activity = new Activity();
 
-        $nrOfLP = count($currentUser->getLicensePlates());
+        $nrOfLP = $counterService->countLP($currentUser);
 
         if($nrOfLP == 1)
         {
