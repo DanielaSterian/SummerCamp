@@ -6,6 +6,7 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
@@ -37,20 +38,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
 
-    public function findUserLP(int $userId)
-    {
-        $q = $this->createQueryBuilder('lp');
 
-        if(isset($userId))
-        {
-            $q ->innerJoin('lp.user', 'u')
-                ->andWhere('u.id = :userId')
-                ->setParameter('userId', $userId);
-        }
-        $q->orderBy('lp.licensePlate', 'ASC');
-
-        return $q;
-    }
 
     // /**
     //  * @return User[] Returns an array of User objects

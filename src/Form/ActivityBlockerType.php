@@ -6,22 +6,15 @@ namespace App\Form;
 
 use App\Entity\Activity;
 use App\Entity\LicensePlate;
-use Doctrine\ORM\EntityRepository;
+use App\Repository\LicensePlateRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Validator\Constraints\Regex;
 
 class ActivityBlockerType extends AbstractType
 {
-
-    public function __construct(Security $security)
-    {
-        $this->security = $security;
-    }
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if($options['oneCar'] == true)
@@ -29,11 +22,9 @@ class ActivityBlockerType extends AbstractType
             $builder
                 ->add('blocker', EntityType::class, [
                         'class' => LicensePlate::class,
-                        'query_builder' => function (EntityRepository $er)
+                        'query_builder' => function (LicensePlateRepository $repo)
                         {
-                            return $er->createQueryBuilder('lp')
-                                ->andWhere('lp.user = :val')
-                                ->setParameter('val', $this->security->getUser());
+                            return $repo->findUserLP();
                         },
                         'choice_label' => 'license_plate',
                         'disabled' => true]
@@ -44,11 +35,9 @@ class ActivityBlockerType extends AbstractType
             $builder
                 ->add('blocker', EntityType::class, [
                     'class' => LicensePlate::class,
-                    'query_builder' => function (EntityRepository $er)
+                    'query_builder' => function (LicensePlateRepository $repo)
                     {
-                        return $er->createQueryBuilder('lp')
-                            ->andWhere('lp.user = :val')
-                            ->setParameter('val', $this->security->getUser());
+                        return $repo->findUserLP();
                     },
                     'choice_label' => 'license_plate',]);
         }

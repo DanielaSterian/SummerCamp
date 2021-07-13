@@ -22,6 +22,14 @@ class LicensePlateRepository extends ServiceEntityRepository
         $this->security = $security;
     }
 
+    public function findUserLP()
+    {
+        return $this->createQueryBuilder('lp')
+            ->andWhere('lp.user = :val')
+            ->setParameter('val', $this->security->getUser());
+    }
+
+
 //    /**
 //     * @return QueryBuilder Returns an array of LicensePlate objects
 //     */

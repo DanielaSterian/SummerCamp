@@ -6,6 +6,7 @@ namespace App\Form;
 
 use App\Entity\Activity;
 use App\Entity\LicensePlate;
+use App\Repository\LicensePlateRepository;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -33,11 +34,9 @@ class ActivityBlockeeType extends AbstractType
             $builder
                 ->add('blockee', EntityType::class, [
                         'class' => LicensePlate::class,
-                        'query_builder' => function (EntityRepository $er)
+                        'query_builder' => function (LicensePlateRepository $repo)
                         {
-                            return $er->createQueryBuilder('lp')
-                                ->andWhere('lp.user = :val')
-                                ->setParameter('val', $this->security->getUser());
+                            return $repo->findUserLP();
                         },
                         'choice_label' => 'license_plate',
                         'disabled' => true]
@@ -48,20 +47,11 @@ class ActivityBlockeeType extends AbstractType
             $builder
                 ->add('blockee', EntityType::class, [
                     'class' => LicensePlate::class,
-                    'query_builder' => function (EntityRepository $er)
+                    'query_builder' => function (LicensePlateRepository $repo)
                     {
-                        return $er->createQueryBuilder('lp')
-                            ->andWhere('lp.user = :val')
-                            ->setParameter('val', $this->security->getUser());
+                        return $repo->findUserLP();
                     },
                     'choice_label' => 'license_plate',]);
-        }
-
-        elseif([$options['noCar'] == true])
-        {
-            $builder
-
-                ->add('blockee', TextType::class);
         }
     }
 
@@ -71,7 +61,6 @@ class ActivityBlockeeType extends AbstractType
             'data_class' => Activity::class,
             'oneCar' => false,
             'multipleCars' =>false,
-            'noCar' => false,
         ]);
     }
 }
