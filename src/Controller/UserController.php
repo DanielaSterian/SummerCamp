@@ -11,6 +11,8 @@ use App\Repository\LicensePlateRepository;
 use App\Service\ActivityService;
 use App\Service\MailService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
@@ -54,6 +56,33 @@ class UserController extends AbstractController
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid())
             {
+                $image = $form->get('imageFile')->getData();
+
+                if(!empty($image))
+                {
+                    $filesystem = new Filesystem();
+                    if($currentUser->getImage())
+                    {
+                        $filesystem->remove($this->getParameter('images_directory') . '/' . $currentUser->getImage());
+                    }
+
+                    $imageName = md5(uniqid()).'.'.$image->guessExtension();
+                    try
+                    {
+                        $image->move(
+                            $this->getParameter('images_directory'),
+                            $imageName
+                        );
+                    }
+                    catch (FileException $e)
+                    {
+                        $this->addFlash('danger', 'Could not upload the image.');
+                        $this->redirectToRoute('register');
+                    }
+
+                    $currentUser->setImage($imageName);
+                }
+
                 $entityManager = $this->getDoctrine()->getManager();
                 $entityManager->persist($currentUser);
                 $entityManager->flush();
