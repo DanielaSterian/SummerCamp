@@ -23,44 +23,52 @@ class ActivityBlockeeType extends AbstractType
     {
         $this->security = $security;
     }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('blocker', TextType::class)
+            ->add('blockee', EntityType::class, [
+                'class' => LicensePlate::class,
+                'query_builder' => function (LicensePlateRepository $repo) {
+                    return $repo->findUserLP();
+                },
+                'choice_label' => 'license_plate',
+//                        'disabled' => true
+            ]);
 
-            ->add('blocker', TextType::class);
-
-        if($options['oneCar'] == true)
-        {
-            $builder
-                ->add('blockee', EntityType::class, [
-                        'class' => LicensePlate::class,
-                        'query_builder' => function (LicensePlateRepository $repo)
-                        {
-                            return $repo->findUserLP();
-                        },
-                        'choice_label' => 'license_plate',
-                        'disabled' => true]
-                );
-        }
-        elseif ($options['multipleCars'] == true)
-        {
-            $builder
-                ->add('blockee', EntityType::class, [
-                    'class' => LicensePlate::class,
-                    'query_builder' => function (LicensePlateRepository $repo)
-                    {
-                        return $repo->findUserLP();
-                    },
-                    'choice_label' => 'license_plate',]);
-        }
+//        if($options['oneCar'] == true)
+//        {
+//            $builder
+//                ->add('blockee', EntityType::class, [
+//                        'class' => LicensePlate::class,
+//                        'query_builder' => function (LicensePlateRepository $repo)
+//                        {
+//                            return $repo->findUserLP();
+//                        },
+//                        'choice_label' => 'license_plate',
+////                        'disabled' => true
+//]);
+//        }
+//        elseif ($options['multipleCars'] == true)
+//        {
+//            $builder
+//                ->add('blockee', EntityType::class, [
+//                    'class' => LicensePlate::class,
+//                    'query_builder' => function (LicensePlateRepository $repo)
+//                    {
+//                        return $repo->findUserLP();
+//                    },
+//                    'choice_label' => 'license_plate',]);
+//        }
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => Activity::class,
-            'oneCar' => false,
-            'multipleCars' =>false,
+//            'oneCar' => false,
+//            'multipleCars' => false,
         ]);
     }
 }

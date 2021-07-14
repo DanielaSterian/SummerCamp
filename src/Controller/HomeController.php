@@ -38,61 +38,50 @@ class HomeController extends AbstractController
 
         $nrOfLP = $counterService->countLP($currentUser);
 
-        if($nrOfLP == 0)
-        {
+        if ($nrOfLP == 0) {
             $this->addFlash("danger", 'You need to add your first car!');
             return $this->redirectToRoute('add-car');
-        }
-        elseif($nrOfLP == 1)
-        {
-            $form = $this->createForm(ActivityBlockerType::class, $activity,[
-                'oneCar' => true,
-                'multipleCars' => false,
-            ]);
-        }
-        elseif($nrOfLP > 1)
-        {
-            $form = $this->createForm(ActivityBlockerType::class, $activity,[
-                'oneCar' => false,
-                'multipleCars' => true,
-            ]);
-        }
-        else
-        {
+        } elseif ($nrOfLP == 1) {
+            $form = $this->createForm(ActivityBlockerType::class, $activity);
+        } elseif ($nrOfLP > 1) {
+            $form = $this->createForm(ActivityBlockerType::class, $activity);
+        } else {
             $this->addFlash("danger", 'Something is wrong');
         }
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $blockeeEntry = $licensePlateRepo->findOneBy(['licensePlate'=>$activity->getBlockee()]);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $this->getDoctrine()->getManager();
 
-            if($blockeeEntry)
-            {
-                $blockerEntry = $licensePlateRepo->findOneBy(['licensePlate' => $activity->getBlocker()]);
-                $mailer->sendBlockeeEmail($blockerEntry->getUser(), $blockeeEntry->getUser(), $blockerEntry->getLicensePlate());
-                $activity->setStatus(1);
-                $this->addFlash('success', 'An email has been sent to the user with the car '.$blockeeEntry);
-            }
-            else
-            {
-                $licensePlate = new LicensePlate();
+            if (!$entityManager->getRepository(Activity::class)->findOneBy(['blocker' => $activity->getBlocker(), 'blockee' => $activity->getBlockee()])) {
 
-                $initialLP = $activity->getBlockee();
-                $finalLP = preg_replace('/[^0-9a-zA-Z]/', '', $initialLP);
-                $licensePlate->setLicensePlate(strtoupper($finalLP));
+                $blockeeEntry = $licensePlateRepo->findOneBy(['licensePlate' => $activity->getBlockee()]);
+
+                if ($blockeeEntry) {
+                    $blockerEntry = $licensePlateRepo->findOneBy(['licensePlate' => $activity->getBlocker()]);
+                    $mailer->sendBlockeeEmail($blockerEntry->getUser(), $blockeeEntry->getUser(), $blockerEntry->getLicensePlate());
+                    $activity->setStatus(1);
+                    $this->addFlash('success', 'An email has been sent to the user with the car ' . $blockeeEntry);
+                } else {
+                    $licensePlate = new LicensePlate();
+
+                    $initialLP = $activity->getBlockee();
+                    $finalLP = preg_replace('/[^0-9a-zA-Z]/', '', $initialLP);
+                    $licensePlate->setLicensePlate(strtoupper($finalLP));
+
+                    $entityManager->persist($licensePlate);
+
+                    $this->addFlash('danger', 'The blockee does not have an account. An email will be sent after registration!');
+                }
 
                 $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->persist($licensePlate);
+                $entityManager->persist($activity);
                 $entityManager->flush();
-
-                $this->addFlash('danger', 'The blockee does not have an account. An email will be sent after registration!');
             }
-
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($activity);
-            $entityManager->flush();
+            else{
+                $this->addFlash('warning', 'You have already notified this person!');
+            }
 
             return $this->redirectToRoute('home');
         }
@@ -113,40 +102,26 @@ class HomeController extends AbstractController
 
         $nrOfLP = $counterService->countLP($currentUser);
 
-        if($nrOfLP == 0)
-        {
+        if ($nrOfLP == 0) {
             $this->addFlash("danger", 'You need to add your first car!');
             return $this->redirectToRoute('add-car');
-        }
-        elseif($nrOfLP == 1)
-        {
-            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
-                'oneCar' => true,
-                'multipleCars' => false,
-            ]);
-        }
-        elseif($nrOfLP > 1)
-        {
-            $form = $this->createForm(ActivityBlockeeType::class, $activity,[
-                'oneCar' => false,
-                'multipleCars' => true,
-            ]);
+        } elseif ($nrOfLP == 1) {
+            $form = $this->createForm(ActivityBlockeeType::class, $activity);
+        } elseif ($nrOfLP > 1) {
+            $form = $this->createForm(ActivityBlockeeType::class, $activity);
         }
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $blockerEntry = $licensePlateRepo->findOneBy(['licensePlate'=>$activity->getBlocker()]);
-            if($blockerEntry)
-            {
+            $blockerEntry = $licensePlateRepo->findOneBy(['licensePlate' => $activity->getBlocker()]);
+            if ($blockerEntry) {
                 $blockeeEntry = $licensePlateRepo->findOneBy(['licensePlate' => $activity->getBlockee()]);
                 $mailer->sendBlockerEmail($blockeeEntry->getUser(), $blockerEntry->getUser(), $blockeeEntry->getLicensePlate());
                 $activity->setStatus(1);
-                $this->addFlash('success', 'An email has been sent to the user with the car '.$blockeeEntry);
-            }
-            else
-            {
+                $this->addFlash('success', 'An email has been sent to the user with the car ' . $blockeeEntry);
+            } else {
                 $licensePlate = new LicensePlate();
 
                 $initialLP = $activity->getBlocker();

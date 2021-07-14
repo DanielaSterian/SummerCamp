@@ -21,30 +21,33 @@ class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('email', EmailType::class, [
-                'label' => 'Email',
-                'attr' => [
-                    'class' => 'form-control']
-            ])
-            ->add('firstName', TextType::class, [
-                'label' => 'First Name',
-                'attr' => [
-                    'class' => 'form-control']
-            ])
-            ->add('lastName', TextType::class, [
-                'label' => 'First Name',
-                'attr' => [
-                    'class' => 'form-control']
-            ])
-            ->add('imageFile', FileType::class, [
-                'label' => 'Profile Image (PNG/JPG/JPEG)',
-                'mapped' => false,
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-control'
-                ]
-            ]);
+        if ($options['forUsual'] == true) {
+            $builder
+                ->add('email', EmailType::class, [
+                    'label' => 'Email',
+                    'attr' => [
+                        'class' => 'form-control']
+                ])
+                ->add('firstName', TextType::class, [
+                    'label' => 'First Name',
+                    'attr' => [
+                        'class' => 'form-control']
+                ])
+                ->add('lastName', TextType::class, [
+                    'label' => 'First Name',
+                    'attr' => [
+                        'class' => 'form-control']
+                ])
+                ->add('imageFile', FileType::class, [
+                    'label' => 'Profile Image (PNG/JPG/JPEG)',
+                    'mapped' => false,
+                    'required' => false,
+                    'attr' => [
+                        'class' => 'form-control'
+                    ]
+                ]);
+        }
+
 
         if ($options['forPass'] == true) {
             $builder
@@ -74,6 +77,7 @@ class UserType extends AbstractType
         $resolver->setDefaults([
             'data_class' => User::class,
             'forPass' => false,
+            'forUsual' => false,
         ]);
     }
 }

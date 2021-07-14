@@ -49,6 +49,7 @@ class UserController extends AbstractController
 
         $form = $this->createForm(UserType::class, $currentUser,[
             'forPass'=>false,
+            'forUsual' => true,
         ]);
 
         if($currentUser)
@@ -258,6 +259,7 @@ class UserController extends AbstractController
 
         $form = $this->createForm(UserType::class, $currentUser, [
             'forPass' => true,
+            'forUsual' => false,
         ]);
 
         $form->handleRequest($request);
