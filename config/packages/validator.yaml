@@ -5,4 +5,11 @@ framework:
         # Enables validator auto-mapping support.
         # For instance, basic validation constraints will be inferred from Doctrine's metadata.
         #auto_mapping:
-        #    App\Entity\: []
+#            App\Entity\User:
+#                properties:
+#                    plainPassword:
+#                        - Length:
+#                              min: 4
+#                              max: 20
+#                              minMessage: 'Your password must be at least {{ min }} characters long'
+#                              maxMessage: 'Your first name cannot be longer than {{ max }} characters'

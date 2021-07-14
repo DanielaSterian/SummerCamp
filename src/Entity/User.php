@@ -39,8 +39,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $password;
 
+//        /**
+//         * @Assert\Length(max=4096)
+//         */
     /**
-     * @Assert\Length(max=4096)
+     * @Assert\Length
+     * (
+     *      min = 5,
+     *      max = 20,
+     * )
      */
     private $plainPassword;
 
@@ -55,7 +62,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $lastName;
 
     /**
-     * @ORM\OneToMany(targetEntity=LicensePlate::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=LicensePlate::class, mappedBy="user" )
      */
     private $licensePlates;
 

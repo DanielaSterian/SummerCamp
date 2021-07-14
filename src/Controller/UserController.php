@@ -115,7 +115,7 @@ class UserController extends AbstractController
         {
             $finalLP = preg_replace('/[^0-9a-zA-Z]/', '', $lp->getLicensePlate());
             $lp->setLicensePlate(strtoupper($finalLP));
-                $entrylicensePlate = $licensePlateRepo->findOneBy(['licensePlate' => $lp->getLicensePlate()]);
+            $entrylicensePlate = $licensePlateRepo->findOneBy(['licensePlate' => $lp->getLicensePlate()]);
 
                 if($entrylicensePlate && !$entrylicensePlate->getUser())
                 {
@@ -261,10 +261,8 @@ class UserController extends AbstractController
         ]);
 
         $form->handleRequest($request);
-        if ($form->isSubmitted())
+        if ($form->isSubmitted() && $form->isValid())
         {
-            if($form->isValid())
-            {
                 if($passwordEncoder->isPasswordValid($currentUser, $form->get('currentPassword')->getData()))
                 {
                     $password = $passwordEncoder->encodePassword($currentUser, $currentUser->getPlainPassword());
@@ -281,7 +279,7 @@ class UserController extends AbstractController
                 {
                     $this->addFlash('danger', 'Current password is not correct!');
                 }
-            }
+
 //            else
 //                {
 //                    $this->addFlash('danger', 'The password must have between 5-20 characters!');

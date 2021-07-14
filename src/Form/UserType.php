@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,10 +22,22 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email', EmailType::class)
-            ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
-            ->add('imageFile', FileType::class,[
+            ->add('email', EmailType::class, [
+                'label' => 'Email',
+                'attr' => [
+                    'class' => 'form-control']
+            ])
+            ->add('firstName', TextType::class, [
+                'label' => 'First Name',
+                'attr' => [
+                    'class' => 'form-control']
+            ])
+            ->add('lastName', TextType::class, [
+                'label' => 'First Name',
+                'attr' => [
+                    'class' => 'form-control']
+            ])
+            ->add('imageFile', FileType::class, [
                 'label' => 'Profile Image (PNG/JPG/JPEG)',
                 'mapped' => false,
                 'required' => false,
@@ -32,19 +45,28 @@ class UserType extends AbstractType
                     'class' => 'form-control'
                 ]
             ]);
-        if($options['forPass'] == true)
-        {
+
+        if ($options['forPass'] == true) {
             $builder
-                ->add('currentPassword', PasswordType::class,[
-                    'mapped'=>false,
+                ->add('currentPassword', PasswordType::class, [
+                    'mapped' => false,
+                    'label' => 'Current Password',
+                    'attr' => [
+                        'class' => 'form-control']
                 ])
                 ->add('plainPassword', RepeatedType::class, [
                     'type' => PasswordType::class,
-                    'first_options'  => array('label' => 'Password'),
-                    'second_options' => array('label' => 'Repeat Password'),
-                    'constraints' => [new Length(['min' => 5, 'max' => 20])]
+                    'first_options' => ['label' => 'Password',
+                        'attr' => ['class' => 'form-control']],
+                    'second_options' => ['label' => 'Repeat Password',
+                        'attr' => ['class' => 'form-control']],
+//                    'constraints' => [new Length(['min' => 5, 'max' => 20])]
                 ]);
         }
+        $builder
+            ->add('save', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-lg btn-primary'],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
