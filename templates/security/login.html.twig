@@ -1,10 +1,205 @@
-{% extends 'base.html.twig' %}
+{% extends 'securityBase.html.twig' %}
 
 {% block title %}Log in!{% endblock %}
 
 {% block body %}
+    <style>
+        /*body {*/
+        /*    height: 100%;*/
+        /*    margin: 0;*/
+        /*    background-repeat: no-repeat;*/
+        /*    background-attachment: fixed;*/
+        /*}*/
+
+        /* Text Align */
+        .text-c {
+            text-align: center;
+        }
+        .text-l {
+            text-align: left;
+        }
+        .text-r {
+            text-align: right
+        }
+        .text-j {
+            text-align: justify;
+        }
+
+        /* Text Color */
+        .text-whitesmoke {
+            color: black;
+        }
+        .text-darkyellow {
+            color: rgb(190, 162, 6)
+        }
+
+        /* Lines */
+
+        .line-b {
+            border-bottom: 1px solid rgb(190, 162, 6) !important;
+        }
+
+        /* Buttons */
+        .button {
+            border-radius: 3px;
+        }
+        .form-button {
+            background-color: rgb(190, 162, 6);
+            border-color: rgb(190, 162, 6);
+            color: #e6e6e6;
+        }
+        .form-button:hover,
+        .form-button:focus,
+        .form-button:active,
+        .form-button.active,
+        .form-button:active:focus,
+        .form-button:active:hover,
+        .form-button.active:hover,
+        .form-button.active:focus {
+            background-color: rgba(255, 235, 59, 0.473);
+            border-color: rgba(255, 235, 59, 0.473);
+            color: #e6e6e6;
+        }
+        .button-l {
+            width: 100% !important;
+        }
+
+        /* Margins g(global) - l(left) - r(right) - t(top) - b(bottom) */
+
+        .margin-g {
+            margin: 15px;
+        }
+        .margin-g-sm {
+            margin: 10px;
+        }
+        .margin-g-md {
+            margin: 20px;
+        }
+        .margin-g-lg {
+            margin: 30px;
+        }
+
+        .margin-l {
+            margin-left: 15px;
+        }
+        .margin-l-sm {
+            margin-left: 10px;
+        }
+        .margin-l-md {
+            margin-left: 20px;
+        }
+        .margin-l-lg {
+            margin-left: 30px;
+        }
+
+        .margin-r {
+            margin-right: 15px;
+        }
+        .margin-r-sm {
+            margin-right: 10px;
+        }
+        .margin-r-md {
+            margin-right: 20px;
+        }
+        .margin-r-lg {
+            margin-right: 30px;
+        }
+
+        .margin-t {
+            margin-top: 15px;
+        }
+        .margin-t-sm {
+            margin-top: 10px;
+        }
+        .margin-t-md {
+            margin-top: 20px;
+        }
+        .margin-t-lg {
+            margin-top: 30px;
+        }
+
+        .margin-b {
+            margin-bottom: 15px;
+        }
+        .margin-b-sm {
+            margin-bottom: 10px;
+        }
+        .margin-b-md {
+            margin-bottom: 20px;
+        }
+        .margin-b-lg {
+            margin-bottom: 30px;
+        }
+
+        /* Bootstrap Form Control Extension */
+
+        .form-control,
+        .border-line {
+            background-color: #5f5f5f;
+            background-image: none;
+            border: 1px solid #424242;
+            border-radius: 1px;
+            color: inherit;
+            display: block;
+            padding: 6px 12px;
+            transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+            width: 100%;
+        }
+        .form-control:focus,
+        .border-line:focus {
+            border-color: rgb(190, 162, 6);
+            background-color: #616161;
+            color: #e6e6e6;
+        }
+        .form-control,
+        .form-control:focus {
+            box-shadow: none;
+        }
+        .form-control::-webkit-input-placeholder { color: #BDBDBD; }
+
+        /* Container */
+
+        .container-content {
+            background-color: #3a3a3aa2;
+            color: inherit;
+            padding: 15px 20px 20px 20px;
+            border-color: rgb(190, 162, 6);
+            border-image: none;
+            border-style: solid solid none;
+            border-width: 1px 0;
+        }
+
+        /* Backgrounds */
+
+        .main-bg {
+
+            background: #343131;
+            background: linear-gradient( #343131, #212121);
+        }
+
+        /* Login & Register Pages*/
+
+        .login-container {
+            max-width: 400px;
+            z-index: 100;
+            margin: 0 auto;
+            padding-top: 100px;
+        }
+        .login.login-container {
+            width: 300px;
+        }
+        .wrapper.login-container {
+            margin-top: 140px;
+        }
+        .logo-badge {
+            color: #e6e6e6;
+            font-size: 80px;
+            font-weight: 800;
+            letter-spacing: -10px;
+            margin-bottom: 0;
+        }
+    </style>
 <form method="post">
-    <h1 class="card-title py-5 text-center"> Log in </h1>
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
@@ -14,36 +209,50 @@
             You are logged in as {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</a>
         </div>
     {% endif %}
-    <div class="container">
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
 
-    <input type="hidden" name="_csrf_token"
-           value="{{ csrf_token('authenticate') }}"
-    >
+{#    <div class="container">#}
+{#        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>#}
+{#        <label for="inputEmail">Email</label>#}
+{#        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>#}
+{#        <label for="inputPassword">Password</label>#}
+{#        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>#}
+{#    #}
+{#        <input type="hidden" name="_csrf_token"#}
+{#               value="{{ csrf_token('authenticate') }}"#}
+{#        >#}
+{#    #}
+{#            <button class="btn btn-lg btn-primary" type="submit">#}
+{#                Sign in#}
+{#            </button>#}
+{#            <br>#}
+{#        <a  href="{{ path('user_registration') }}">Don't have an account? Register here</a>#}
+{#    </div>#}
 
-        <button class="btn btn-lg btn-primary" type="submit">
-            Sign in
-        </button>
-        <br>
 
-        <a  href="{{ path('user_registration') }}">Don't have an account? Register here</a>
+    <div class="login-container text-c animated flipInX">
+        <div>
+            <h1 class="logo-badge text-whitesmoke"><span class="fa fa-user-circle"></span></h1>
+        </div>
+        <h3 class="text-whitesmoke">Sign In </h3>
+        <div class="container-content">
+            <form class="margin-t">
+                <div class="form-group">
+                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus placeholder="Username">
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required placeholder="***">
+                </div>
+                <input type="hidden" name="_csrf_token"
+                       value="{{ csrf_token('authenticate') }}"
+                >
+                <button type="submit" class="form-button button-l margin-b">Sign In</button>
+
+                <p class="text-whitesmoke text-center"><small><b>Do not have an account?</b></small></p>
+                <a class="text-darkyellow" href="{{ path('user_registration') }}"><small>Sign Up</small></a>
+            </form>
+        </div>
     </div>
 
-    {#
-        Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-        See https://symfony.com/doc/current/security/remember_me.html
-
-        <div class="checkbox mb-3">
-            <label>
-                <input type="checkbox" name="_remember_me"> Remember me
-            </label>
-        </div>
-    #}
-
-
 </form>
+
 {% endblock %}

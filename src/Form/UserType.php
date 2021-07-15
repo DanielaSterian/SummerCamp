@@ -39,7 +39,6 @@ class UserType extends AbstractType
                         'class' => 'form-control']
                 ])
                 ->add('imageFile', FileType::class, [
-                    'label' => 'Profile Image (PNG/JPG/JPEG)',
                     'mapped' => false,
                     'required' => false,
                     'attr' => [
@@ -68,7 +67,7 @@ class UserType extends AbstractType
         }
         $builder
             ->add('save', SubmitType::class, [
-                'attr' => ['class' => 'btn btn-lg btn-primary'],
+                'attr' => ['class' => 'btn btn-lg btn-warning'],
             ]);
     }
 

@@ -57,6 +57,7 @@ class SecurityController extends AbstractController
         $user = new User();
         $form = $this->createForm(UserType::class, $user, [
             'forPass' => false,
+            'forUsual'=>true
         ]);
 
         // 2) handle the submit (will only happen on POST)

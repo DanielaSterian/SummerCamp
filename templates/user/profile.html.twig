@@ -3,46 +3,238 @@
 {% block title %}User details{% endblock %}
 
 {% block body %}
-<div class="w-100 text-center px-5">
-    <h1 class="card-title py-5 text-center"> Your profile, {{ user.firstName}} </h1>
-    {% if(user != null) %}
+    <style>
+        body {
+            background-color: #f9f9fa
+        }
 
-        {% if(user.image != null) %}
-            <img src="{{ asset('uploads/' ~ user.image) }}" class="w-25">
+        .padding {
+            padding: 3rem !important
+        }
+
+        .user-card-full {
+            overflow: hidden
+        }
+
+        .card {
+            border-radius: 5px;
+            -webkit-box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+            box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
+            border: none;
+            margin-bottom: 30px
+        }
+
+        .m-r-0 {
+            margin-right: 0px
+        }
+
+        .m-l-0 {
+            margin-left: 0px
+        }
+
+        .user-card-full .user-profile {
+            border-radius: 5px 0 0 5px
+        }
+
+        .bg-c-lite-green {
+            background: linear-gradient(to right, #424242, #000000)
+        }
+
+        .user-profile {
+            padding: 20px 0
+        }
+
+        .card-block {
+            padding: 1.25rem
+        }
+
+        .m-b-25 {
+            margin-bottom: 25px
+        }
+
+        .img-radius {
+            border-radius: 5px
+        }
+
+        h6 {
+            font-size: 14px
+        }
+
+        .card .card-block p {
+            line-height: 25px
+        }
+
+        @media only screen and (min-width: 1400px) {
+            p {
+                font-size: 14px
+            }
+        }
+
+        .card-block {
+            padding: 1.25rem
+        }
+
+        .b-b-default {
+            border-bottom: 1px solid #e0e0e0
+        }
+
+        .m-b-20 {
+            margin-bottom: 20px
+        }
+
+        .p-b-5 {
+            padding-bottom: 5px !important
+        }
+
+        .card .card-block p {
+            line-height: 25px
+        }
+
+        .m-b-10 {
+            margin-bottom: 10px
+        }
+
+        .text-muted {
+            color: #919aa3 !important
+        }
+
+        .b-b-default {
+            border-bottom: 1px solid #e0e0e0
+        }
+
+        .f-w-600 {
+            font-weight: 600
+        }
+
+        .m-b-20 {
+            margin-bottom: 20px
+        }
+
+        .m-t-40 {
+            margin-top: 20px
+        }
+
+        .p-b-5 {
+            padding-bottom: 5px !important
+        }
+
+        .m-b-10 {
+            margin-bottom: 10px
+        }
+
+        .m-t-40 {
+            margin-top: 20px
+        }
+
+        .user-card-full .social-link li {
+            display: inline-block
+        }
+
+        .user-card-full .social-link li a {
+            font-size: 20px;
+            margin: 0 10px 0 0;
+            -webkit-transition: all 0.3s ease-in-out;
+            transition: all 0.3s ease-in-out
+        }
+        .text-darkyellow {
+            color: rgb(190, 162, 6)
+        }
+    </style>
+
+    <div class="page-content page-container" id="page-content">
+        <h1 class="card-title py-5 text-center"> <b>Your profile, {{ user.firstName}}</b> </h1>
+        {% if(user != null) %}
+        <div class="padding">
+            <div class="row container d-flex justify-content-center">
+                <div class="col-xl-6 col-md-12">
+                    <div class="card user-card-full">
+                        <div class="row m-l-0 m-r-0">
+                            <div class="col-sm-4 bg-c-lite-green user-profile">
+                                <div class="card-block text-center text-white">
+                                    <div class="m-b-25">
+                                        {% if(user.image != null) %}
+                                            <img src="{{ asset('uploads/' ~ user.image) }}" class="w-25">
+                                        {% else %}
+                                        <img src="https://img.icons8.com/bubbles/100/000000/user.png" class="img-radius" alt="User-Profile-Image">
+                                        {% endif%}
+                                    </div>
+                                    <br>
+                                    <a class="btn btn-warning btn-sm" name="update-user" href="{{ path('edit-profile')}}">
+                                        <i class="fa fa-edit" aria-hidden="true"></i> Edit profile
+                                    </a>
+
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="card-block">
+                                    <h6 class="m-b-20 p-b-5 b-b-default f-w-600">Informations</h6>
+                                    <div class="col">
+                                        <div class="row-sm-6">
+                                            <p class="m-b-10 f-w-600"><b>First Name</b></p>
+                                            <h6 class="text-muted f-w-400">{{ user.firstName }}</h6>
+                                        </div>
+                                        <div class="row-sm-6">
+                                            <p class="m-b-10 f-w-600"><b>Last Name</b></p>
+                                            <h6 class="text-muted f-w-400">{{ user.lastName }}</h6>
+                                        </div>
+                                        <div class="row-sm-6">
+                                            <p class="m-b-10 f-w-600"><b>Email</b></p>
+                                            <h6 class="text-muted f-w-400">{{ user.email }}</h6>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endif %}
-        <table class="table table-striped table-dark">
-            <tr>
-                <th>
-                    First Name
-                </th>
-                <td>
-                    {{ user.getFirstName() }}
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    Last Name
-                </th>
-                <td>
-                    {{ user.getLastName() }}
-                </td>
-            </tr>
-            <tr>
-                <th>
-                    Email
-                </th>
-                <td>
-                    {{ user.getUserIdentifier() }}
-                </td>
-            </tr>
+    </div>
 
-        </table>
-    {#    <a type="button" class="btn btn-secondary p-3 m-2" href="#">#}
-    {#        <i class="fa fa-backward" aria-hidden="true"></i> Back#}
-    {#    </a>#}
-        <a class="btn btn-warning p-3 m-2" name="update-user" href="{{ path('edit-profile')}}">
-            <i class="fa fa-edit" aria-hidden="true"></i> Edit
-        </a>
-    {% endif %}
-</div>
+
+
+{#<div class="w-100 text-center px-5">#}
+{#    <h1 class="card-title py-5 text-center"> Your profile, {{ user.firstName}} </h1>#}
+{#    {% if(user != null) %}#}
+
+{#        {% if(user.image != null) %}#}
+{#            <img src="{{ asset('uploads/' ~ user.image) }}" class="w-25">#}
+{#        {% endif %}#}
+{#        <table class="table table-striped table-dark">#}
+{#            <tr>#}
+{#                <th>#}
+{#                    First Name#}
+{#                </th>#}
+{#                <td>#}
+{#                    {{ user.getFirstName() }}#}
+{#                </td>#}
+{#            </tr>#}
+{#            <tr>#}
+{#                <th>#}
+{#                    Last Name#}
+{#                </th>#}
+{#                <td>#}
+{#                    {{ user.getLastName() }}#}
+{#                </td>#}
+{#            </tr>#}
+{#            <tr>#}
+{#                <th>#}
+{#                    Email#}
+{#                </th>#}
+{#                <td>#}
+{#                    {{ user.getUserIdentifier() }}#}
+{#                </td>#}
+{#            </tr>#}
+
+{#        </table>#}
+{#    #}{#    <a type="button" class="btn btn-secondary p-3 m-2" href="#">#}
+{#    #}{#        <i class="fa fa-backward" aria-hidden="true"></i> Back#}
+{#    #}{#    </a>#}
+{#        <a class="btn btn-warning p-3 m-2" name="update-user" href="{{ path('edit-profile')}}">#}
+{#            <i class="fa fa-edit" aria-hidden="true"></i> Edit#}
+{#        </a>#}
+{#    {% endif %}#}
+{#</div>#}
 {% endblock %}

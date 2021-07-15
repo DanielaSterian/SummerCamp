@@ -3,9 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Hello HomeController!{% endblock %}</title>
-    {# Run `composer require symfony/webpack-encore-bundle`
-           and uncomment the following Encore helpers to start using Symfony UX #}
+    <title>{% block title %}Welcome!{% endblock %}</title>
+
     {% block stylesheets %}
         {{ encore_entry_link_tags('app') }}
     {% endblock %}
@@ -15,7 +14,7 @@
     {% endblock %}
 </head>
 
-<body>
+<body class="bgimage">
     <div class="collapse" id="navbarToggleExternalContent">
         <div class="bg-dark p-4">
             <h5 class="text-white h4">Who blocked me</h5>
@@ -36,16 +35,19 @@
             </div>
         {% endfor %}
     {% endfor %}
-<br>
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="btn-group btn-group-lg col-md-8" >
-            <a type="button" class="btn btn-dark" href="{{ path('list-cars', {id:app.user.id}) }}">View your cars</a>
-            <a type="button" class="btn btn-dark" href="{{ path('block-someone', {id:app.user.id}) }}">Block someone</a>
-            <a type="button" class="btn btn-dark" href="{{ path('unblock-me', {id:app.user.id}) }}">Unblock me</a>
-        </div>
+
+    <br>
+{#    <div class="row">#}
+{#        <div class="col-md-2"></div>#}
+{#        <div class="btn-group btn-group-lg col-md-8" >#}
+{#            <a type="button" class="btn btn-dark" href="{{ path('list-cars', {id:app.user.id}) }}">View your cars</a>#}
+{#            <a type="button" class="btn btn-dark" href="{{ path('block-someone', {id:app.user.id}) }}">Block someone</a>#}
+{#            <a type="button" class="btn btn-dark" href="{{ path('unblock-me', {id:app.user.id}) }}">Unblock me</a>#}
+{#        </div>#}
+{#    </div>#}
+<br><br><br><br><br><br><br>
+    <div style="padding: 0">
+    <a class="butt btn btn-dark" type="button" href="{{ path('block-someone', {id:app.user.id}) }}" ><br><br>Block Someone</a>
+    <a class="butt btn btn-dark" type="button" href="{{ path('unblock-me', {id:app.user.id}) }}"><br><br>Unblock Me</a>
     </div>
-
-
-
 </body>
