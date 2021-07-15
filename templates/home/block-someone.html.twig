@@ -31,7 +31,7 @@
         .signup-form h2:before, .signup-form h2:after {
             content: "";
             height: 2px;
-            width: 30%;
+            width: 20%;
             background: #d4d4d4;
             position: absolute;
             top: 50%;
@@ -114,25 +114,5 @@
 
         {{ form_end(form) }}
     </div>
-
-{#    <div class="container">#}
-{#        {{ form_start(form) }}#}
-
-{#        <label>#}
-{#            <b>Blockee</b>#}
-{#        </label>#}
-{#        {{ form_widget(form.blockee, {'attr': {'class': 'form-control'}}) }}#}
-
-{#        <label>#}
-{#            <b>Blocker</b>#}
-{#        </label>#}
-{#        {{ form_widget(form.blocker, {'attr': {'class': 'form-control'}}) }}#}
-
-{#        <button class="btn btn-lg btn-primary" type="submit">#}
-{#            Submit#}
-{#        </button>#}
-{#        {{ form_end(form) }}#}
-
-{#    </div>#}
 
 {% endblock %}
