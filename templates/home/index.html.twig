@@ -13,6 +13,20 @@
         {{ encore_entry_script_tags('app') }}
     {% endblock %}
 </head>
+<style>
+    .container {
+        height: 200px;
+    }
+
+    .center {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+</style>
 
 <body class="bgimage">
     <div class="collapse" id="navbarToggleExternalContent">
@@ -37,17 +51,18 @@
     {% endfor %}
 
     <br>
-{#    <div class="row">#}
-{#        <div class="col-md-2"></div>#}
-{#        <div class="btn-group btn-group-lg col-md-8" >#}
-{#            <a type="button" class="btn btn-dark" href="{{ path('list-cars', {id:app.user.id}) }}">View your cars</a>#}
-{#            <a type="button" class="btn btn-dark" href="{{ path('block-someone', {id:app.user.id}) }}">Block someone</a>#}
-{#            <a type="button" class="btn btn-dark" href="{{ path('unblock-me', {id:app.user.id}) }}">Unblock me</a>#}
-{#        </div>#}
-{#    </div>#}
-<br><br><br><br><br><br><br>
-    <div style="padding: 0">
-    <a class="butt btn btn-dark" type="button" href="{{ path('block-someone', {id:app.user.id}) }}" ><br><br>Block Someone</a>
-    <a class="butt btn btn-dark" type="button" href="{{ path('unblock-me', {id:app.user.id}) }}"><br><br>Unblock Me</a>
+    <div class="align-content-center container center">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="btn-group btn-group-lg col-md-8" >
+                <a type="button" class="btn btn-dark" href="{{ path('block-someone', {id:app.user.id}) }}">Block someone</a>
+                <a type="button" class="btn btn-dark" href="{{ path('unblock-me', {id:app.user.id}) }}">Unblock me</a>
+            </div>
+        </div>
     </div>
+
+{#    <div style="padding: 0">#}
+{#    <a class="butt btn btn-dark" type="button" href="{{ path('block-someone', {id:app.user.id}) }}" ><br><br>Block Someone</a>#}
+{#    <a class="butt btn btn-dark" type="button" href="{{ path('unblock-me', {id:app.user.id}) }}"><br><br>Unblock Me</a>#}
+{#    </div>#}
 </body>
